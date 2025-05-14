@@ -95,9 +95,11 @@
     </footer>
 
     <script>
+        const API_URL = 'https://agendasimplebackend-production.up.railway.app';
+
         // Función para cargar los contactos desde la API
         function cargarContactos() {
-            fetch('http://localhost:8080/contactos', { method: 'GET' })
+            fetch(`${API_URL}/contactos`, { method: 'GET' })
                 .then(response => response.text())
                 .then(data => {
                     const contactos = data.split(',');
@@ -117,7 +119,7 @@
         function agregarContacto() {
             const nombre = document.getElementById('nuevoContacto').value.trim();
             if (nombre) {
-                fetch('http://localhost:8080/addContacto', {
+                fetch(`${API_URL}/addContacto`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'text/plain'
@@ -142,4 +144,3 @@
 
 </body>
 </html>
-
