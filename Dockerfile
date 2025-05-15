@@ -1,18 +1,26 @@
-# Usa una imagen base de Java
-FROM eclipse-temurin:17-jdk
+# Etapa de construcción
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
-# Directorio de trabajo dentro del contenedor
+# Copiar el código fuente
 WORKDIR /app
-
-# Copiar el archivo JAR del conector MySQL
-COPY mysql-connector-j-8.3.0.jar .
-
-# Copiar los archivos fuente
+COPY pom.xml .
 COPY src ./src
 
-# Compilar el código Java
-RUN javac -cp ".:mysql-connector-j-8.3.0.jar" -d out src/main/java/mycompany/agendasimplebackend/SimpleServer.java
+# Construir el fat jar (uber-jar)
+RUN mvn clean package
 
-# Comando por defecto para ejecutar tu servidor
-CMD ["java", "-cp", "out:mysql-connector-j-8.3.0.jar", "mycompany.agendasimplebackend.SimpleServer"]
+# Etapa de ejecución
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+# Copiar el jar generado
+COPY --from=build /app/target/AgendaSimpleBackend-1.0-jar-with-dependencies.jar app.jar
+
+# Exponer el puerto (Railway detectará esto)
+EXPOSE 8080
+
+# Comando para ejecutar la app
+CMD ["java", "-jar", "app.jar"]
+
 
