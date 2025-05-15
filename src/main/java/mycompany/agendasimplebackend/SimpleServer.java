@@ -15,8 +15,8 @@ import java.util.List;
 public class SimpleServer {
 
     // Configuración de la base de datos
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/agenda";
-    private static final String DB_USER = "root";
+    private static final String DB_URL = "jdbc:mysql://18.217.100.110:3306/agenda";
+    private static final String DB_USER = "adminMysql";
     private static final String DB_PASSWORD = "12345"; 
 
     public static void main(String[] args) throws Exception {
