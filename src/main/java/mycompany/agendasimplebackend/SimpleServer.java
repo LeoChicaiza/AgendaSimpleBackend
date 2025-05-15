@@ -18,10 +18,11 @@ public class SimpleServer {
     private static final String DB_URL = "jdbc:mysql://18.217.100.110:3306/agenda";
     private static final String DB_USER = "adminMysql";
     private static final String DB_PASSWORD = "12345";
-
+    
     public static void main(String[] args) throws Exception {
         // Crear servidor en el puerto 8080
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        Class.forName("com.mysql.cj.jdbc.Driver");
 
         // Ruta GET /contactos
         server.createContext("/contactos", new HttpHandler() {
