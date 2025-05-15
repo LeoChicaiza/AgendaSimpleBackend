@@ -17,7 +17,7 @@ public class SimpleServer {
     // Configuración de la base de datos
     private static final String DB_URL = "jdbc:mysql://18.217.100.110:3306/agenda";
     private static final String DB_USER = "adminMysql";
-    private static final String DB_PASSWORD = "12345"; 
+    private static final String DB_PASSWORD = "12345";
 
     public static void main(String[] args) throws Exception {
         // Crear servidor en el puerto 8080
@@ -27,9 +27,16 @@ public class SimpleServer {
         server.createContext("/contactos", new HttpHandler() {
             @Override
             public void handle(HttpExchange exchange) throws IOException {
+                if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    agregarCabecerasCORS(exchange);
+                    exchange.sendResponseHeaders(204, -1);
+                    return;
+                }
+
                 if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
                     List<String> contactos = getContactosDesdeDB();
                     String response = String.join(",", contactos);
+                    agregarCabecerasCORS(exchange);
                     exchange.sendResponseHeaders(200, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();
                     os.write(response.getBytes());
@@ -44,11 +51,18 @@ public class SimpleServer {
         server.createContext("/addContacto", new HttpHandler() {
             @Override
             public void handle(HttpExchange exchange) throws IOException {
+                if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    agregarCabecerasCORS(exchange);
+                    exchange.sendResponseHeaders(204, -1);
+                    return;
+                }
+
                 if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                     InputStream is = exchange.getRequestBody();
                     String nuevoContacto = new String(is.readAllBytes()).trim();
                     boolean agregado = agregarContactoDB(nuevoContacto);
                     String response = agregado ? "Contacto agregado con éxito" : "Error al agregar contacto";
+                    agregarCabecerasCORS(exchange);
                     exchange.sendResponseHeaders(agregado ? 200 : 500, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();
                     os.write(response.getBytes());
@@ -96,4 +110,12 @@ public class SimpleServer {
             return false;
         }
     }
+
+    // Agregar cabeceras CORS
+    private static void agregarCabecerasCORS(HttpExchange exchange) {
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+    }
 }
+
